@@ -418,7 +418,7 @@ void dump_file_to_location (unsigned int addr, unsigned int length, string src_f
 int main (int argc, char* argv[]) 
 {
 
-    unsigned int res_mem_low_addr = 0x18100000;
+    unsigned int res_mem_low_addr = 0x18400000;
     unsigned int res_mem_length   = 0x1000000; //32MB
 
     //write left map at the beginning of the reserved memory
@@ -556,11 +556,11 @@ int main (int argc, char* argv[])
     printf ("micro seconds elapsed for capturing %d frames: %ld\n", NUM_IMAGES, total_usec_elapsed);
     printf ("average micro seconds elapsed for capturing 1 frame pair: %ld\n", avg_usec_elapsed);
 
-    for(int k=0; k<IMG_WIDTH*IMG_HEIGHT;k++)
+/*    for(int k=0; k<IMG_WIDTH*IMG_HEIGHT;k++)
     {
         disp_img
         printf("%d \n",);
-    }
+    }*/
     
     return 0;
 }
