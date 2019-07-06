@@ -1,3 +1,6 @@
+import struct
+import sys
+
 
 for i in range(IMG_HEIGHT):
     for j in range(IMG_WIDTH):
@@ -13,3 +16,13 @@ for i in range(IMG_HEIGHT):
             empty[i][j] = Image_buf[640*480*2+i*IMG_WIDTH+j]
 
 cv2.imwrite('/home/xilinx/sgm_pynq_ver/disp_im_buffer.png',empty)
+
+
+f=open(sys.argv[2],"wb")
+
+for i in range(IMG_HEIGHT) :
+	for j in range(IMG_WIDTH):
+		byte=struct.pack('B',image[i,j])
+		f.write(byte)
+
+f.close()

@@ -25,6 +25,8 @@ Image_buf_phy_addr = xlnk.cma_get_phy_addr(Image_buf)
 
 print(hex(Image_buf_phy_addr))
 
+Xlnk.cma_free(Image_buf)
+
 #Run the code of elp with the above physical address
 
 
