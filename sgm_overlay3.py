@@ -104,11 +104,11 @@ for i in range(IMG_HEIGHT):
             rec_imr_buffer[i][j] = Image_buf[11*image_size+i*IMG_WIDTH+j]
             rec_iml_buffer[i][j] = Image_buf[10*image_size+i*IMG_WIDTH+j]
 
-cv2.imwrite('/home/xilinx/sgm_pynq_ver/raw_iml_buffer.png',raw_iml_buffer)
-cv2.imwrite('/home/xilinx/sgm_pynq_ver/raw_imr_buffer.png',raw_imr_buffer)
-cv2.imwrite('/home/xilinx/sgm_pynq_ver/rec_iml_buffer.png',rec_iml_buffer)
-cv2.imwrite('/home/xilinx/sgm_pynq_ver/rec_imr_buffer.png',rec_imr_buffer)
-cv2.imwrite('/home/xilinx/sgm_pynq_ver/disp_im_buffer.png',disp_im_buffer)
+cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/raw_iml_buffer.png',raw_iml_buffer)
+cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/raw_imr_buffer.png',raw_imr_buffer)
+cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/rec_iml_buffer.png',rec_iml_buffer)
+cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/rec_imr_buffer.png',rec_imr_buffer)
+cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im_buffer)
 
 
 
