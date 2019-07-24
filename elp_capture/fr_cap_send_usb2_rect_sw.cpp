@@ -51,7 +51,7 @@
 using namespace std;
 using namespace cv;
 
-#define NUM_IMAGES        10             //no of images to be captured
+#define NUM_IMAGES        100000             //no of images to be captured
 #define THROW_AWAY_FRAMES 0             //'THROW_AWAY_FRAMES' no of frames are thrown away before the first frame is captured
                                         // should be useful in sunlight to allow cam to adjust exposure 
 #define SERVER_IP         "10.107.88.24" 
@@ -371,7 +371,7 @@ int main (int argc, char* argv[])
 {
 
     //map the reserved memory and return ptr to it
-     unsigned int res_mem_low_addr = 0x18400000;
+     unsigned int res_mem_low_addr = 0x1a000000;
      unsigned int res_mem_length   = 0x1000000; //32MB
      int fd_mem = open ("/dev/mem", O_RDWR);
      char* mem_ptr = (char*)mmap (NULL, res_mem_length, PROT_READ|PROT_WRITE, MAP_SHARED, fd_mem, res_mem_low_addr);
@@ -401,26 +401,26 @@ int main (int argc, char* argv[])
     //               8 out
     //vga registers: 0 control -> bit 0:start(LSB)
     //               1 image_addr
-    uint16_t sgm0_block_number=0,sgm1_block_number=1,remapl_block_number=2,remapr_block_number=3;
+    
     //move appropriate values into appropriate addresses
     //inL
-    *(reg_ptr + sgm0_block_number*0x04000 + 4) = res_mem_low_addr; 
-    *(reg_ptr + sgm1_block_number*0x04000 + 4) = res_mem_low_addr + ADDRESS_OFFSET; 
+    *(reg_ptr + 0*0x04000 + 4) = res_mem_low_addr; 
+    *(reg_ptr + 1*0x04000 + 4) = res_mem_low_addr + ADDRESS_OFFSET; 
     printf("sgm block 0 inL reg address: %x data: %x\n",(reg_ptr + 0*0x04000 + 4), res_mem_low_addr); 
     //inR
-    *(reg_ptr + sgm0_block_number*0x04000 + 6) = res_mem_low_addr + IMG_WIDTH*IMG_HEIGHT; 
-    *(reg_ptr + sgm1_block_number*0x04000 + 6) = res_mem_low_addr + IMG_WIDTH*IMG_HEIGHT +  ADDRESS_OFFSET; 
+    *(reg_ptr + 0*0x04000 + 6) = res_mem_low_addr + IMG_WIDTH*IMG_HEIGHT; 
+    *(reg_ptr + 1*0x04000 + 6) = res_mem_low_addr + IMG_WIDTH*IMG_HEIGHT +  ADDRESS_OFFSET; 
     printf("sgm block 0 inR reg address: %x data: %x\n",(reg_ptr + 0*0x04000 + 6), res_mem_low_addr+IMG_WIDTH*IMG_HEIGHT); 
     //outD
-    *(reg_ptr + sgm0_block_number*0x04000 + 8) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT; 
-    *(reg_ptr + sgm1_block_number*0x04000 + 8) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT +  ADDRESS_OFFSET; 
+    *(reg_ptr + 0*0x04000 + 8) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT; 
+    *(reg_ptr + 1*0x04000 + 8) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT +  ADDRESS_OFFSET; 
     printf("sgm block 0 outD reg address: %x data: %x\n",(reg_ptr + 0*0x04000 + 8), res_mem_low_addr+2*IMG_WIDTH*IMG_HEIGHT); 
     //start peripherals on autorestart
-    *(reg_ptr + sgm0_block_number*0x04000 + 0) = *(reg_ptr + sgm0_block_number*0x04000 + 0) | 0b10000001; 
-    *(reg_ptr + sgm1_block_number*0x04000 + 0) = *(reg_ptr + sgm1_block_number*0x04000 + 0) | 0b10000001; 
+    *(reg_ptr + 0*0x04000 + 0) = *(reg_ptr + 0*0x04000 + 0) | 0b10000001; 
+    *(reg_ptr + 1*0x04000 + 0) = *(reg_ptr + 1*0x04000 + 0) | 0b10000001; 
     //vga
-    //*(reg_ptr + 2*0x04000 + 1) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT; //show disp image
-    //*(reg_ptr + 2*0x04000 + 0) = *(reg_ptr + 2*0x04000 + 0) | 0b00000001; //start vga peripheral
+    *(reg_ptr + 2*0x04000 + 1) = res_mem_low_addr + 2*IMG_WIDTH*IMG_HEIGHT; //show disp image
+    *(reg_ptr + 2*0x04000 + 0) = *(reg_ptr + 2*0x04000 + 0) | 0b00000001; //start vga peripheral
 
     //setup the socket
     int sock_left = 0;

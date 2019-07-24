@@ -3,7 +3,7 @@
 # source /opt/Xilinx/petalinux-v2017.1/settings.sh
 
 # APP_NAME=elp_with_cpp_class
-APP_NAME=fr_cap_send_usb2_rect_sw
+APP_NAME=fr_cap_send_usb2_rect_hw
 
 
 .PHONY: $(APP_NAME).elf
