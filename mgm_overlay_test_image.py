@@ -10,7 +10,7 @@ IMG_WIDTH         =640
 IMG_HEIGHT        =480
 FILTER_SIZE     =9
 FILTER_OFFS     =(int)(FILTER_SIZE/2)
-SECTIONS        =1
+SECTIONS        =5
 SECTION_HEIGHT  =(int)((IMG_HEIGHT-2*FILTER_OFFS)/SECTIONS)
 DISP_IMG_HEIGHT =SECTIONS*SECTION_HEIGHT
 BYTES_PER_PIXEL =1
@@ -18,14 +18,14 @@ TOTAL_BYTES     =DISP_IMG_HEIGHT*IMG_WIDTH*BYTES_PER_PIXEL
 ADDRESS_OFFSET  =int(TOTAL_BYTES/SECTIONS)
 image_size = int(IMG_WIDTH*IMG_HEIGHT)
 
-overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
+overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/design_1.bit')
 overlay
 
-#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
-#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
+imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
+imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
 
-imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_iml_buffer.png', 0);
-imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_imr_buffer.png', 0);
+#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_iml_buffer.png', 0);
+#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_imr_buffer.png', 0);
 
 left_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_left_rmap.bin",dtype=np.ubyte,count=-1,sep='')
 right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rmap.bin",dtype=np.ubyte,count=-1,sep='')
@@ -34,6 +34,10 @@ right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rma
 print(overlay.ip_dict.keys())
 
 SGM_GreyCost_0 = overlay.SGM_GreyCost_0
+SGM_GreyCost_1 = overlay.SGM_GreyCost_1
+SGM_GreyCost_2 = overlay.SGM_GreyCost_2
+SGM_GreyCost_3 = overlay.SGM_GreyCost_3
+#SGM_GreyCost_0 = overlay.SGM_GreyCost_0
 ##sgm_optim_1 = overlay.#sgm_optim_1
 remap_hls_0 = overlay.remap_hls_0
 remap_hls_1 = overlay.remap_hls_1
@@ -70,18 +74,26 @@ remap_hls_0.write(pout_V,Image_buf_phy_addr+10*image_size)
 remap_hls_1.write(pin_V,Image_buf_phy_addr+1*image_size)
 remap_hls_1.write(pout_V,Image_buf_phy_addr+11*image_size)
 
-#sgm_optim_1.write(LeftIm_offs,Image_buf_phy_addr+10*image_size)
-#sgm_optim_1.write(RightIm_offs,Image_buf_phy_addr+11*image_size)
-#sgm_optim_1.write(DispIm_offs,Image_buf_phy_addr+12*image_size)
 SGM_GreyCost_0.write(inL_offs,Image_buf_phy_addr+0*image_size)
 SGM_GreyCost_0.write(inR_offs,Image_buf_phy_addr+1*image_size)
 SGM_GreyCost_0.write(outD_offs,Image_buf_phy_addr+12*image_size)
+SGM_GreyCost_1.write(inL_offs,Image_buf_phy_addr+0*image_size + ADDRESS_OFFSET)
+SGM_GreyCost_1.write(inR_offs,Image_buf_phy_addr+1*image_size + ADDRESS_OFFSET)
+SGM_GreyCost_1.write(outD_offs,Image_buf_phy_addr+12*image_size + ADDRESS_OFFSET)
+SGM_GreyCost_2.write(inL_offs,Image_buf_phy_addr+0*image_size + 2*ADDRESS_OFFSET)
+SGM_GreyCost_2.write(inR_offs,Image_buf_phy_addr+1*image_size + 2*ADDRESS_OFFSET)
+SGM_GreyCost_2.write(outD_offs,Image_buf_phy_addr+12*image_size + 2*ADDRESS_OFFSET)
+SGM_GreyCost_3.write(inL_offs,Image_buf_phy_addr+0*image_size + 3*ADDRESS_OFFSET)
+SGM_GreyCost_3.write(inR_offs,Image_buf_phy_addr+1*image_size + 3*ADDRESS_OFFSET)
+SGM_GreyCost_3.write(outD_offs,Image_buf_phy_addr+12*image_size + 3*ADDRESS_OFFSET)
 
 
 remap_hls_0.write(CTRL_reg_offset,0b00000001)
 remap_hls_1.write(CTRL_reg_offset,0b00000001)
+SGM_GreyCost_3.write(CTRL_reg_offset,0b00000001)
+SGM_GreyCost_2.write(CTRL_reg_offset,0b00000001)
+SGM_GreyCost_1.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_0.write(CTRL_reg_offset,0b00000001)
-#sgm_optim_1.write(CTRL_reg_offset,0b00000001)
 
 count = 0
 sad0_done = False
