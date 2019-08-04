@@ -53,9 +53,9 @@ map_data_V = remap_hls_0.register_map.map_data_V.address
 pin_V = remap_hls_0.register_map.pin_V.address
 pout_V = remap_hls_0.register_map.pout_V.address
 
-#xlnk = Xlnk()
+xlnk = Xlnk()
 
-#Image_buf =  xlnk.cma_alloc(0x0A00000, data_type = "unsigned char")
+Image_buf =  xlnk.cma_alloc(0x0A00000, data_type = "unsigned char")
 
 Image_buf_phy_addr = xlnk.cma_get_phy_addr(Image_buf)
 
@@ -99,13 +99,12 @@ count = 0
 sad0_done = False
 sgm1_done = False
 start_time = time.time()
-while(not(sad0_done)):
-	sad0_done = sad0_done or SGM_GreyCost_0.register_map.CTRL.AP_DONE
-	#sgm1_done = sgm1_done or sgm_optim_1.register_map.CTRL.AP_DONE
-	#print(count)
-	#count = count + 1
-	pass
-
+# while(not(sad0_done)):
+# 	sad0_done = sad0_done or SGM_GreyCost_0.register_map.CTRL.AP_DONE
+# 	#sgm1_done = sgm1_done or sgm_optim_1.register_map.CTRL.AP_DONE
+# 	#print(count)
+# 	#count = count + 1
+# 	pass
 print("--- %s seconds ---" % (time.time() - start_time))
 
 raw_iml_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
@@ -113,6 +112,17 @@ raw_imr_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 rec_iml_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 rec_imr_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 disp_im_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
+
+
+while(count < 5000):
+	print(count)
+	count = count +1
+	for i in range(IMG_HEIGHT):
+		for j in range(IMG_WIDTH):
+			disp_im_buffer[i][j] = Image_buf[12*image_size+i*IMG_WIDTH+j]
+	cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im_buffer)
+	Image_buf[0:image_size] = test1[0:image_size]                       #left raw image
+	Image_buf[image_size:image_size*2] = test2[0:image_size]            #right raw image
 
 for i in range(IMG_HEIGHT):
 	for j in range(IMG_WIDTH):
