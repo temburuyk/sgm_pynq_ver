@@ -18,14 +18,13 @@ TOTAL_BYTES     =DISP_IMG_HEIGHT*IMG_WIDTH*BYTES_PER_PIXEL
 ADDRESS_OFFSET  =int(TOTAL_BYTES/SECTIONS)
 image_size = int(IMG_WIDTH*IMG_HEIGHT)
 
-overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/design_1.bit')
+overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/II1/design_1.bit')
 overlay
 
-imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
-imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
-
-#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_iml_buffer.png', 0);
-#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_imr_buffer.png', 0);
+#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
+#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
+imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_left.bmp', 0);
+imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_right.bmp', 0);
 
 left_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_left_rmap.bin",dtype=np.ubyte,count=-1,sep='')
 right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rmap.bin",dtype=np.ubyte,count=-1,sep='')
@@ -37,7 +36,7 @@ SGM_GreyCost_0 = overlay.SGM_GreyCost_0
 SGM_GreyCost_1 = overlay.SGM_GreyCost_1
 SGM_GreyCost_2 = overlay.SGM_GreyCost_2
 SGM_GreyCost_3 = overlay.SGM_GreyCost_3
-#SGM_GreyCost_0 = overlay.SGM_GreyCost_0
+SGM_GreyCost_4 = overlay.SGM_GreyCost_4
 ##sgm_optim_1 = overlay.#sgm_optim_1
 remap_hls_0 = overlay.remap_hls_0
 remap_hls_1 = overlay.remap_hls_1
@@ -86,10 +85,14 @@ SGM_GreyCost_2.write(outD_offs,Image_buf_phy_addr+12*image_size + 2*ADDRESS_OFFS
 SGM_GreyCost_3.write(inL_offs,Image_buf_phy_addr+0*image_size + 3*ADDRESS_OFFSET)
 SGM_GreyCost_3.write(inR_offs,Image_buf_phy_addr+1*image_size + 3*ADDRESS_OFFSET)
 SGM_GreyCost_3.write(outD_offs,Image_buf_phy_addr+12*image_size + 3*ADDRESS_OFFSET)
+SGM_GreyCost_4.write(inL_offs,Image_buf_phy_addr+0*image_size + 4*ADDRESS_OFFSET)
+SGM_GreyCost_4.write(inR_offs,Image_buf_phy_addr+1*image_size + 4*ADDRESS_OFFSET)
+SGM_GreyCost_4.write(outD_offs,Image_buf_phy_addr+12*image_size + 4*ADDRESS_OFFSET)
 
 
 remap_hls_0.write(CTRL_reg_offset,0b00000001)
 remap_hls_1.write(CTRL_reg_offset,0b00000001)
+SGM_GreyCost_4.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_3.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_2.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_1.write(CTRL_reg_offset,0b00000001)
@@ -99,13 +102,15 @@ count = 0
 sad0_done = False
 sgm1_done = False
 start_time = time.time()
-# while(not(sad0_done)):
-# 	sad0_done = sad0_done or SGM_GreyCost_0.register_map.CTRL.AP_DONE
-# 	#sgm1_done = sgm1_done or sgm_optim_1.register_map.CTRL.AP_DONE
-# 	#print(count)
-# 	#count = count + 1
-# 	pass
+while(not(sad0_done)):
+	sad0_done = sad0_done or SGM_GreyCost_0.register_map.CTRL.AP_DONE
+	#sgm1_done = sgm1_done or sgm_optim_1.register_map.CTRL.AP_DONE
+	#print(count)
+	#count = count + 1
+	pass
+
 print("--- %s seconds ---" % (time.time() - start_time))
+
 
 raw_iml_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 raw_imr_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
@@ -114,15 +119,15 @@ rec_imr_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 disp_im_buffer = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
 
 
-while(count < 5000):
-	print(count)
-	count = count +1
-	for i in range(IMG_HEIGHT):
-		for j in range(IMG_WIDTH):
-			disp_im_buffer[i][j] = Image_buf[12*image_size+i*IMG_WIDTH+j]
-	cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im_buffer)
-	Image_buf[0:image_size] = test1[0:image_size]                       #left raw image
-	Image_buf[image_size:image_size*2] = test2[0:image_size]            #right raw image
+# while(count < 5000):
+# 	print(count)
+# 	count = count +1
+# 	for i in range(IMG_HEIGHT):
+# 		for j in range(IMG_WIDTH):
+# 			disp_im_buffer[i][j] = Image_buf[12*image_size+i*IMG_WIDTH+j]
+# 	cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im_buffer)
+# 	Image_buf[0:image_size] = test1[0:image_size]                       #left raw image
+# 	Image_buf[image_size:image_size*2] = test2[0:image_size]            #right raw image
 
 for i in range(IMG_HEIGHT):
 	for j in range(IMG_WIDTH):
