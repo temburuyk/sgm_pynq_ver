@@ -27,8 +27,10 @@ overlay
 # imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_iml_buffer.png', 0);
 # imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/rec_imr_buffer.png', 0);
 
-imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_left.bmp', 0);
-imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_right.bmp', 0);
+# imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_left.bmp', 0);
+# imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/reindeer_right.bmp', 0);
+imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/art_left.bmp', 0);
+imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/art_right.bmp', 0);
 
 left_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_left_rmap.bin",dtype=np.ubyte,count=-1,sep='')
 right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rmap.bin",dtype=np.ubyte,count=-1,sep='')
@@ -52,9 +54,9 @@ map_data_V = remap_hls_0.register_map.map_data_V.address
 pin_V = remap_hls_0.register_map.pin_V.address
 pout_V = remap_hls_0.register_map.pout_V.address
 
-# xlnk = Xlnk()
+xlnk = Xlnk()
 
-# Image_buf =  xlnk.cma_alloc(0x0A00000, data_type = "unsigned char")
+Image_buf =  xlnk.cma_alloc(0x0A00000, data_type = "unsigned char")
 
 Image_buf_phy_addr = xlnk.cma_get_phy_addr(Image_buf)
 

@@ -110,6 +110,7 @@ cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/rec_iml_buffer.png',rec_iml
 cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/rec_imr_buffer.png',rec_imr_buffer)
 cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im_buffer)
 
-
+capl.release()
+capr.release()
 
 Xlnk.cma_free(Image_buf)
