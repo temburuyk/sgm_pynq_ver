@@ -18,14 +18,14 @@ TOTAL_BYTES     =DISP_IMG_HEIGHT*IMG_WIDTH*BYTES_PER_PIXEL
 ADDRESS_OFFSET  =int(TOTAL_BYTES/SECTIONS)
 image_size = int(IMG_WIDTH*IMG_HEIGHT)
 
-overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/design_1.bit')
-#overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
+#overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/design_1.bit')
+overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
 overlay
 
-imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
-imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
-#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Reindeer/view1.png', 0);
-#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Reindeer/view5.png', 0);
+#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_left.ppm', 0);
+#imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/teddy_right.ppm', 0);
+imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Dolls/view1.png', 0);
+imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Dolls/view5.png', 0);
 imagel = cv2.resize(imagel,(640,480));
 imager = cv2.resize(imager,(640,480));
 left_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_left_rmap.bin",dtype=np.ubyte,count=-1,sep='')
@@ -148,3 +148,4 @@ cv2.imwrite('/home/xilinx/sgm_pynq_ver/output_images/disp_im_buffer.png',disp_im
 
 
 Xlnk.cma_free(Image_buf)
+
