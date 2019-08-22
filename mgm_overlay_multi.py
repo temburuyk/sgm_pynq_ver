@@ -29,8 +29,8 @@ right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rma
 capl = cv2.VideoCapture(0)
 capr = cv2.VideoCapture(1)
 
-#overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/II2/design_1.bit')
-overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
+overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/II2/design_1.bit')
+#overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
 overlay
 
 print(overlay.ip_dict.keys())
