@@ -62,3 +62,24 @@ while(count < 10000):
 #cv2.imshow('image',imagel)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
+
+import cffi
+
+ffi = cffi.FFI()
+test_buf =  xlnk.cma_alloc(0x0A, data_type = "unsigned char")
+buffer = ffi.buffer(test_buf,10)  #converts c data object to python memory readable object
+array = np.frombuffer(buffer, dtype=np.ubyte).reshape((2,5)) # converts the buffer to np object which access the same memory
+
+Disp_time1 = time.time()
+Image_buf[0:image_size] = test1[0:image_size]                       #left raw image
+Image_buf[image_size:image_size*2] = test2[0:image_size]            #right raw image
+Data_time = time.time() - Disp_time1 
+print("Data transfer time ",Data_time)
+
+Disp_time1 = time.time()
+np.copyto(rec_iml_buffer, disp_im_buffer)
+Data_time = time.time() - Disp_time1 
+print("Data transfer time ",Data_time)
+
