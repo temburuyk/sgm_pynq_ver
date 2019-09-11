@@ -270,6 +270,54 @@ void setup_sgm_bottom () {
     int_ptr[8] = 0x1a200000 + ADDRESS_OFFSET;
     int_ptr[0] = 0x81;
 }
+void setup_sgm_bottom2 () {
+    int fd = open ("/dev/mem", O_RDWR | O_SYNC);
+    if (fd < 0) {
+        printf ("ERROR : failed to open /dev/mem\n");
+        return;
+    }
+    //address of sgm_top peripheral from vivado project
+    unsigned int sgm_low_addr = 0x43c50000;
+    unsigned int sgm_length   = 16;
+    unsigned char *ptr = (unsigned char *) mmap (NULL, sgm_length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, sgm_low_addr);
+    int *int_ptr = (int *) ptr;
+    int_ptr[4] = 0x1a000000 + 2*ADDRESS_OFFSET;
+    int_ptr[6] = 0x1a100000 + 2*ADDRESS_OFFSET;
+    int_ptr[8] = 0x1a200000 + 2*ADDRESS_OFFSET;
+    int_ptr[0] = 0x81;
+}
+void setup_sgm_bottom3 () {
+    int fd = open ("/dev/mem", O_RDWR | O_SYNC);
+    if (fd < 0) {
+        printf ("ERROR : failed to open /dev/mem\n");
+        return;
+    }
+    //address of sgm_top peripheral from vivado project
+    unsigned int sgm_low_addr = 0x43c60000;
+    unsigned int sgm_length   = 16;
+    unsigned char *ptr = (unsigned char *) mmap (NULL, sgm_length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, sgm_low_addr);
+    int *int_ptr = (int *) ptr;
+    int_ptr[4] = 0x1a000000 + 3*ADDRESS_OFFSET;
+    int_ptr[6] = 0x1a100000 + 3*ADDRESS_OFFSET;
+    int_ptr[8] = 0x1a200000 + 3*ADDRESS_OFFSET;
+    int_ptr[0] = 0x81;
+}
+void setup_sgm_bottom4 () {
+    int fd = open ("/dev/mem", O_RDWR | O_SYNC);
+    if (fd < 0) {
+        printf ("ERROR : failed to open /dev/mem\n");
+        return;
+    }
+    //address of sgm_top peripheral from vivado project
+    unsigned int sgm_low_addr = 0x43c70000;
+    unsigned int sgm_length   = 16;
+    unsigned char *ptr = (unsigned char *) mmap (NULL, sgm_length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, sgm_low_addr);
+    int *int_ptr = (int *) ptr;
+    int_ptr[4] = 0x1a000000 + 4*ADDRESS_OFFSET;
+    int_ptr[6] = 0x1a100000 + 4*ADDRESS_OFFSET;
+    int_ptr[8] = 0x1a200000 + 4*ADDRESS_OFFSET;
+    int_ptr[0] = 0x81;
+}
 
 //if there was a third sgm peripheral we would have used: int_ptr[4] = 0x1a000000 + 2*ADDRESS_OFFSET;
 void peripheral_setup(){
@@ -310,8 +358,10 @@ void peripheral_setup(){
     *(reg_ptr + 3*0x04000 + 6) = raw_left_img; 
     *(reg_ptr + 4*0x04000 + 6) = raw_right_img;
     //remap: pout
-    uint32_t rect_left_img  = raw_right_img + IMG_WIDTH*IMG_HEIGHT;
-    uint32_t rect_right_img = rect_left_img + IMG_WIDTH*IMG_HEIGHT; 
+    //uint32_t rect_left_img  = raw_right_img + IMG_WIDTH*IMG_HEIGHT; 
+    uint32_t rect_left_img  = res_mem_low_addr;
+    //uint32_t rect_right_img = rect_left_img + IMG_WIDTH*IMG_HEIGHT; 
+    uint32_t rect_right_img = rect_left_img + 0x00100000;
     *(reg_ptr + 3*0x04000 + 8) = rect_left_img; 
     *(reg_ptr + 4*0x04000 + 8) = rect_right_img; 
     //sgm: inL
@@ -327,7 +377,8 @@ void peripheral_setup(){
     *(reg_ptr + 6*0x04000 + 6) = rect_right_img +  3*ADDRESS_OFFSET;
     *(reg_ptr + 7*0x04000 + 6) = rect_right_img +  4*ADDRESS_OFFSET;
     //sgm: outD
-    uint32_t disp_img = rect_right_img + IMG_WIDTH*IMG_HEIGHT;
+    //uint32_t disp_img = rect_right_img + IMG_WIDTH*IMG_HEIGHT;
+    uint32_t disp_img = rect_right_img + 0x00100000;
     *(reg_ptr + 0*0x04000 + 8) = disp_img;
     *(reg_ptr + 1*0x04000 + 8) = disp_img +  ADDRESS_OFFSET; 
     *(reg_ptr + 5*0x04000 + 8) = disp_img +  2*ADDRESS_OFFSET;
@@ -344,10 +395,10 @@ void peripheral_setup(){
     *(reg_ptr + 6*0x04000 + 0) = *(reg_ptr + 1*0x04000 + 0) | 0b10000001; 
     *(reg_ptr + 7*0x04000 + 0) = *(reg_ptr + 1*0x04000 + 0) | 0b10000001; 
     //remap
-    *(reg_ptr + 3*0x04000 + 0) = *(reg_ptr + 3*0x04000 + 0) | 0b10000001; 
-    *(reg_ptr + 4*0x04000 + 0) = *(reg_ptr + 4*0x04000 + 0) | 0b10000001; 
+    //*(reg_ptr + 3*0x04000 + 0) = *(reg_ptr + 3*0x04000 + 0) | 0b10000001; 
+    //*(reg_ptr + 4*0x04000 + 0) = *(reg_ptr + 4*0x04000 + 0) | 0b10000001; 
     //vga
-    *(reg_ptr + 2*0x04000 + 0) = *(reg_ptr + 2*0x04000 + 0) | 0b10000001;
+    //*(reg_ptr + 2*0x04000 + 0) = *(reg_ptr + 2*0x04000 + 0) | 0b00000001;
 }
 
 //function used for writing file to memory in linux_xsct
@@ -414,11 +465,11 @@ int main (int argc, char* argv[]) {
 
     reserved_memory_setup ();
     //write left map at the beginning of the reserved memory
-    dump_file_to_location(res_mem_low_addr, IMG_WIDTH*IMG_HEIGHT, "elp640_left_rmap.bin");
+    //dump_file_to_location(res_mem_low_addr, IMG_WIDTH*IMG_HEIGHT, "elp640_left_rmap.bin");
     //write right map below left map
-    dump_file_to_location(res_mem_low_addr+4*IMG_WIDTH*IMG_HEIGHT, IMG_WIDTH*IMG_HEIGHT, "elp640_right_rmap.bin");
+    //dump_file_to_location(res_mem_low_addr+4*IMG_WIDTH*IMG_HEIGHT, IMG_WIDTH*IMG_HEIGHT, "elp640_right_rmap.bin");
 
-	//setup_vga ();
+    setup_vga ();
 
     ZedVideoCapture v ("/dev/video0");
 
@@ -438,12 +489,7 @@ int main (int argc, char* argv[]) {
         // imshow (title0, view_left);
         // imshow (title1, view_right);
 
-/*        Mat rectified_left;
-        remap (view_left, rectified_left, left_rmap0, left_rmap1, INTER_LINEAR);
-        Mat rectified_right;
-        remap (view_right, rectified_right, right_rmap0, right_rmap1, INTER_LINEAR);
-*/
-        unsigned char *left_data = view_left.data;
+/*        unsigned char *left_data = view_left.data;
         for (int i = 0; i < view_left.rows; i++) {
             for (int j = 0; j < view_left.cols; j++) {
                 leftBuffer[i*640+j] = left_data[i*view_left.step + j];
@@ -454,7 +500,26 @@ int main (int argc, char* argv[]) {
             for (int j = 0; j < view_right.cols; j++) {
                 rightBuffer[i*640+j] = right_data[i*view_right.step + j];
             }
+        }*/
+        //--------------
+        Mat rectified_left;
+        remap (view_left, rectified_left, left_rmap0, left_rmap1, INTER_LINEAR);
+        Mat rectified_right;
+        remap (view_right, rectified_right, right_rmap0, right_rmap1, INTER_LINEAR);
+
+        unsigned char *left_data = rectified_left.data;
+        for (int i = 0; i < rectified_left.rows; i++) {
+            for (int j = 0; j < rectified_left.cols; j++) {
+                leftBuffer[i*640+j] = left_data[i*rectified_left.step + j];
+            }
         }
+        unsigned char *right_data = rectified_right.data;
+        for (int i = 0; i < rectified_right.rows; i++) {
+            for (int j = 0; j < rectified_right.cols; j++) {
+                rightBuffer[i*640+j] = right_data[i*rectified_right.step + j];
+            }
+        }
+        //---------------
         // Mat left640_480;
         // left640_480 = Mat::zeros (480, 640, CV_8U);
         // for (int i = 0; i < left640_480.rows; i++) {
@@ -481,9 +546,12 @@ int main (int argc, char* argv[]) {
         // cout << t;
         // sleep (1);
         if (t == 0) {
-            //setup_sgm_top ();
-            //setup_sgm_bottom ();
-            peripheral_setup();
+            setup_sgm_top ();
+            setup_sgm_bottom ();
+            setup_sgm_bottom2();
+            setup_sgm_bottom3();
+            setup_sgm_bottom4();
+            //peripheral_setup();
         }
         // sleep (1);
         // cout << "Done" << endl;

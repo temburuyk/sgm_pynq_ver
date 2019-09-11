@@ -14,6 +14,7 @@ $(APP_NAME).elf: $(APP_NAME).cpp
 	#link
 	arm-linux-gnueabihf-g++ -O3 -Wl,-rpath=/mnt/lib -fopenmp -o $(APP_NAME).elf $(APP_NAME).o -L/home/mandardatar/local_install/opencv/build/install/lib -lopencv_calib3d -lopencv_core  -lopencv_features2d -lopencv_flann -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc -lopencv_ml -lopencv_objdetect -lopencv_photo -lopencv_stitching -lopencv_videoio -lopencv_video
 	#scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $(APP_NAME).elf root@10.107.88.118:/mnt/ 
+	scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $(APP_NAME).elf root@10.107.95.174:/mnt/ 
 
 clean:
 	rm $(APP_NAME).elf $(APP_NAME).o

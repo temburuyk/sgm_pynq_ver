@@ -17,19 +17,35 @@ BYTES_PER_PIXEL =1
 TOTAL_BYTES     =DISP_IMG_HEIGHT*IMG_WIDTH*BYTES_PER_PIXEL
 ADDRESS_OFFSET  =int(TOTAL_BYTES/SECTIONS)
 image_size = int(IMG_WIDTH*IMG_HEIGHT)
+ZED_IMAGE_WIDTH   =1344
+ZED_IMAGE_WIDTH_2 = int(ZED_IMAGE_WIDTH/2)
+ZED_IMAGE_HEIGHT  =376
 
 #overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_multi_bit/design_1.bit')
 overlay = Overlay('/home/xilinx/sgm_pynq_ver/census_mgm_bit/design_1.bit')
 overlay
 
-imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/left_image79.jpg', 0);
-imager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/right_image79.jpg', 0);
-#imagel = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Reindeer/view1.png', 0);
-#mager = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/ALL-2views/Reindeer/view5.png', 0);
-imagel = cv2.resize(imagel,(640,480));
-imager = cv2.resize(imager,(640,480));
-left_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_left_rmap.bin",dtype=np.ubyte,count=-1,sep='')
-right_rmap = np.fromfile("/home/xilinx/sgm_pynq_ver/elp_capture/elp640_right_rmap.bin",dtype=np.ubyte,count=-1,sep='')
+image = cv2.imread('/home/xilinx/sgm_pynq_ver/test_images/right_image32.jpg', 0);
+imagel = np.zeros((ZED_IMAGE_HEIGHT,ZED_IMAGE_WIDTH),dtype=np.ubyte)
+imager = np.zeros((ZED_IMAGE_HEIGHT,ZED_IMAGE_WIDTH),dtype=np.ubyte)
+rectified_left = np.zeros((ZED_IMAGE_HEIGHT,ZED_IMAGE_WIDTH),dtype=np.ubyte)
+rectified_right = np.zeros((ZED_IMAGE_HEIGHT,ZED_IMAGE_WIDTH),dtype=np.ubyte)
+buffer_left = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
+buffer_right = np.zeros((IMG_HEIGHT,IMG_WIDTH),dtype=np.ubyte)
+imagel[0:ZED_IMAGE_HEIGHT,0:ZED_IMAGE_WIDTH_2] = image[0:ZED_IMAGE_HEIGHT,0:ZED_IMAGE_WIDTH_2]
+imager[0:ZED_IMAGE_HEIGHT,0:ZED_IMAGE_WIDTH_2] = image[0:ZED_IMAGE_HEIGHT,ZED_IMAGE_WIDTH_2:ZED_IMAGE_WIDTH]
+
+
+# imagel[0:ZED_IMAGE_HEIGHT,0:640] = image[0:ZED_IMAGE_HEIGHT,0:640]
+# imager[0:ZED_IMAGE_HEIGHT,0:640] = image[0:ZED_IMAGE_HEIGHT,672:1312]
+
+fs_left = cv2.FileStorage("/home/xilinx/sgm_pynq_ver/zed_camera/zed_left_calibration.yml", cv2.FILE_STORAGE_READ)
+fs_right = cv2.FileStorage("/home/xilinx/sgm_pynq_ver/zed_camera/zed_right_calibration.yml", cv2.FILE_STORAGE_READ)
+left_rmap0 = fs_left.getNode("rmap0").mat()
+left_rmap1 = fs_left.getNode("rmap1").mat()
+right_rmap0 = fs_right.getNode("rmap0").mat()
+right_rmap1 = fs_right.getNode("rmap1").mat()
+
 
 
 print(overlay.ip_dict.keys())
@@ -60,13 +76,18 @@ Image_buf =  xlnk.cma_alloc(0x0A00000, data_type = "unsigned char")
 
 Image_buf_phy_addr = xlnk.cma_get_phy_addr(Image_buf)
 
-test1 = imagel.flatten()
-test2 = imager.flatten()
+
+rectified_left = cv2.remap (imagel, left_rmap0, left_rmap1, cv2.INTER_LINEAR)
+rectified_right = cv2.remap (imager, right_rmap0, right_rmap1, cv2.INTER_LINEAR)
+
+buffer_left[0:ZED_IMAGE_HEIGHT,0:640] = rectified_left[0:ZED_IMAGE_HEIGHT,0:IMG_WIDTH]
+buffer_right[0:ZED_IMAGE_HEIGHT,0:640] = rectified_right[0:ZED_IMAGE_HEIGHT,0:IMG_WIDTH]
+
+test1 = buffer_left.flatten()
+test2 = buffer_right.flatten()
 
 Image_buf[0:image_size] = test1[0:image_size]                       #left raw image
 Image_buf[image_size:image_size*2] = test2[0:image_size]            #right raw image
-Image_buf[image_size*2:image_size*6]= left_rmap[0:image_size*4]     #left cam rec map
-Image_buf[image_size*6:image_size*10]= right_rmap[0:image_size*4]     #right cam rec map
 
 remap_hls_0.write(map_data_V,Image_buf_phy_addr+2*image_size)
 remap_hls_1.write(map_data_V,Image_buf_phy_addr+6*image_size)
@@ -75,8 +96,8 @@ remap_hls_0.write(pout_V,Image_buf_phy_addr+10*image_size)
 remap_hls_1.write(pin_V,Image_buf_phy_addr+1*image_size)
 remap_hls_1.write(pout_V,Image_buf_phy_addr+11*image_size)
 
-SGM_GreyCost_0.write(inL_offs,Image_buf_phy_addr+10*image_size)
-SGM_GreyCost_0.write(inR_offs,Image_buf_phy_addr+11*image_size)
+SGM_GreyCost_0.write(inL_offs,Image_buf_phy_addr+0*image_size)
+SGM_GreyCost_0.write(inR_offs,Image_buf_phy_addr+1*image_size)
 SGM_GreyCost_0.write(outD_offs,Image_buf_phy_addr+12*image_size)
 SGM_GreyCost_1.write(inL_offs,Image_buf_phy_addr+10*image_size + ADDRESS_OFFSET)
 SGM_GreyCost_1.write(inR_offs,Image_buf_phy_addr+11*image_size + ADDRESS_OFFSET)
@@ -92,8 +113,6 @@ SGM_GreyCost_4.write(inR_offs,Image_buf_phy_addr+11*image_size + 4*ADDRESS_OFFSE
 SGM_GreyCost_4.write(outD_offs,Image_buf_phy_addr+12*image_size + 4*ADDRESS_OFFSET)
 
 
-remap_hls_0.write(CTRL_reg_offset,0b00000001)
-remap_hls_1.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_4.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_3.write(CTRL_reg_offset,0b00000001)
 SGM_GreyCost_2.write(CTRL_reg_offset,0b00000001)
